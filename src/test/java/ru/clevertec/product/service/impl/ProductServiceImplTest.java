@@ -9,6 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import ru.clevertec.product.data.InfoProductDto;
 import ru.clevertec.product.data.ProductDto;
 import ru.clevertec.product.entity.Product;
+import ru.clevertec.product.exception.ProductNotFoundException;
 import ru.clevertec.product.mapper.ProductMapper;
 import ru.clevertec.product.repository.ProductRepository;
 import ru.clevertec.product.utils.ProductTestData;
@@ -19,7 +20,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -66,18 +67,21 @@ class ProductServiceImplTest {
     }
 
     @Test
-    public void shouldReturnNullWhenProductDoesNotExist() {
+    public void shouldThrowExceptionWhenProductDoesNotExist() {
         //Given
         UUID uuid = UUID.fromString("3ecb77f7-0114-47a7-ada7-3ec685d202a7");
         when(productRepository.findById(uuid))
                 .thenReturn(Optional.empty());
 
         //When
-        InfoProductDto result = productService.get(uuid);
+        ProductNotFoundException exception = assertThrows(ProductNotFoundException.class, () -> productService.get(uuid));
 
         //Then
-        assertNull(result);
-        verify(productRepository).findById(uuid);
+        assertEquals(String.format("Product with uuid: %s not found", uuid), exception.getMessage());
+
+        verify(productRepository)
+                .findById(uuid);
+
         verifyNoInteractions(productMapper);
     }
 
@@ -106,21 +110,29 @@ class ProductServiceImplTest {
 
         //Then
         assertEquals(expected, result);
-        verify(productRepository).findAll();
-        verify(productMapper).toInfoProductDto(product);
+
+        verify(productRepository)
+                .findAll();
+
+        verify(productMapper)
+                .toInfoProductDto(product);
     }
 
     @Test
     public void shouldReturnEmptyListWhenNoProductsExist() {
         //Given
-        when(productRepository.findAll()).thenReturn(Collections.emptyList());
+        when(productRepository.findAll())
+                .thenReturn(Collections.emptyList());
 
         //When
         List<InfoProductDto> result = productService.getAll();
 
         //Then
         assertTrue(result.isEmpty());
-        verify(productRepository).findAll();
+
+        verify(productRepository)
+                .findAll();
+
         verifyNoInteractions(productMapper);
     }
 
@@ -146,8 +158,12 @@ class ProductServiceImplTest {
 
         //Then
         assertEquals(product.getUuid(), result);
-        verify(productMapper).toProduct(productDto);
-        verify(productRepository).save(product);
+
+        verify(productMapper)
+                .toProduct(productDto);
+
+        verify(productRepository)
+                .save(product);
     }
 
     @Test
@@ -160,6 +176,8 @@ class ProductServiceImplTest {
                 .buildProduct();
 
         ProductDto productDto = ProductTestData.builder()
+                .withName("New name")
+                .withDescription("New description")
                 .build()
                 .buildProductDto();
 
@@ -173,23 +191,32 @@ class ProductServiceImplTest {
         productService.update(product.getUuid(), productDto);
 
         //Then
-        verify(productRepository).findById(product.getUuid());
-        verify(productMapper).merge(product, productDto);
-        verify(productRepository).save(productCaptor.capture());
+        verify(productRepository)
+                .findById(product.getUuid());
 
-        Product savedProduct = productCaptor.getValue();
-        assertEquals(product, savedProduct);
+        verify(productMapper)
+                .merge(product, productDto);
+
+        verify(productRepository)
+                .save(productCaptor.capture());
+
+        assertEquals(product, productCaptor.getValue());
     }
 
     @Test
     public void shouldDeleteExistingProduct() {
         //Given
         UUID uuid = UUID.fromString("3ecb77f7-0114-47a7-ada7-3ec685d202a7");
+        Product product = ProductTestData.builder()
+                .build()
+                .buildProduct();
+        when(productRepository.findById(uuid)).thenReturn(Optional.of(product));
 
         //When
         productService.delete(uuid);
 
         //Then
+        verify(productRepository).findById(uuid);
         verify(productRepository).delete(uuid);
     }
 }
