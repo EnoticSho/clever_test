@@ -36,7 +36,7 @@ public class ProductTestData {
     public ProductDto buildProductDto() {
         return new ProductDto(name, description, price);
     }
-
+  
     public InfoProductDto buildInfoProductDto() {
         return new InfoProductDto(uuid, name, description, price);
     }
