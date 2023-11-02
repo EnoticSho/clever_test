@@ -16,6 +16,8 @@ public interface ProductMapper {
      * @param productDto - DTO для маппинга
      * @return новый продукт
      */
+    @Mapping(target = "uuid", ignore = true)
+    @Mapping(target = "created", ignore = true)
     Product toProduct(ProductDto productDto);
 
     /**
