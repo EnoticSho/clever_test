@@ -66,7 +66,10 @@ class InMemoryProductRepositoryTest {
 
         // Then
         assertThat(savedProduct)
-                .hasFieldOrPropertyWithValue(Product.Fields.name, expected.getName());
+                .hasFieldOrPropertyWithValue(Product.Fields.name, expected.getName())
+                .hasFieldOrPropertyWithValue(Product.Fields.description, expected.getDescription())
+                .hasFieldOrPropertyWithValue(Product.Fields.price, expected.getPrice())
+                .hasFieldOrPropertyWithValue(Product.Fields.created, expected.getCreated());
     }
 
     @Test
@@ -98,6 +101,7 @@ class InMemoryProductRepositoryTest {
                 .withUuid(null)
                 .build()
                 .buildProduct();
+
         Product expected2 = ProductTestData.builder()
                 .withUuid(UUID.fromString("ebc3c5b1-aeaa-44f5-8d8a-bfcc53de36e6"))
                 .withName("ProductName1")
@@ -106,6 +110,7 @@ class InMemoryProductRepositoryTest {
                 .withCreated(LocalDateTime.of(2023, 11, 13, 12, 34))
                 .build()
                 .buildProduct();
+
         repository.save(expected1);
         repository.save(expected2);
 
@@ -119,7 +124,7 @@ class InMemoryProductRepositoryTest {
 
     @Test
     void shouldReturnEmptyListWhenNoProductsAreSaved() {
-        // When
+        // Given & When
         List<Product> allProducts = repository.findAll();
 
         // Then
