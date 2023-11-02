@@ -1,10 +1,12 @@
 package ru.clevertec.product.mapper.impl;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.clevertec.product.data.InfoProductDto;
 import ru.clevertec.product.data.ProductDto;
 import ru.clevertec.product.entity.Product;
 import ru.clevertec.product.mapper.ProductMapper;
+import ru.clevertec.product.repository.impl.InMemoryProductRepository;
 import ru.clevertec.product.utils.ProductTestData;
 
 import java.math.BigDecimal;
@@ -13,10 +15,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class ProductMapperImplTest {
 
-    private final ProductMapper productMapper = new ProductMapperImpl();
+    private ProductMapper productMapper;
+
+    @BeforeEach
+    void setUp() {
+        productMapper = new ProductMapperImpl();
+    }
 
     @Test
-    void toProduct_ShouldCreateProductFromDto_WhenGivenValidProductDto() {
+    void toProduct_ShouldCreateProductFromDtoWhenGivenValidProductDto() {
         //Given
         ProductDto expectedDto = ProductTestData.builder()
                 .build()
@@ -36,7 +43,7 @@ class ProductMapperImplTest {
     }
 
     @Test
-    void toInfoProductDto_ShouldCreateInfoProductDtoFromProduct_WhenGivenValidProduct() {
+    void toInfoProductDto_ShouldCreateInfoProductDtoFromProductWhenGivenValidProduct() {
         //Given
         Product expected = ProductTestData.builder()
                 .build()
@@ -55,7 +62,7 @@ class ProductMapperImplTest {
     }
 
     @Test
-    void merge_ShouldUpdateProductFromDto_WhenGivenValidProductAndProductDto() {
+    void merge_ShouldUpdateProductFromDtoWhenGivenValidProductAndProductDto() {
         //Given
         Product expectedProduct = ProductTestData.builder()
                 .build()
