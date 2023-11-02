@@ -2,6 +2,7 @@ package ru.clevertec.product.utils;
 
 import lombok.Builder;
 import lombok.Data;
+import ru.clevertec.product.data.InfoProductDto;
 import ru.clevertec.product.data.ProductDto;
 import ru.clevertec.product.entity.Product;
 
@@ -34,5 +35,9 @@ public class ProductTestData {
 
     public ProductDto buildProductDto() {
         return new ProductDto(name, description, price);
+    }
+  
+    public InfoProductDto buildInfoProductDto() {
+        return new InfoProductDto(uuid, name, description, price);
     }
 }
