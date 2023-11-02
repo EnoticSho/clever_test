@@ -2,11 +2,11 @@ package ru.clevertec.product.mapper.impl;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mapstruct.factory.Mappers;
 import ru.clevertec.product.data.InfoProductDto;
 import ru.clevertec.product.data.ProductDto;
 import ru.clevertec.product.entity.Product;
 import ru.clevertec.product.mapper.ProductMapper;
-import ru.clevertec.product.repository.impl.InMemoryProductRepository;
 import ru.clevertec.product.utils.ProductTestData;
 
 import java.math.BigDecimal;
@@ -19,7 +19,7 @@ class ProductMapperImplTest {
 
     @BeforeEach
     void setUp() {
-        productMapper = new ProductMapperImpl();
+        productMapper = Mappers.getMapper(ProductMapper.class);
     }
 
     @Test
