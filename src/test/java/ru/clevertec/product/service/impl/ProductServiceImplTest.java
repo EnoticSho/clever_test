@@ -28,6 +28,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ProductServiceImplTest {
+    private final ArgumentCaptor<Product> productCaptor = ArgumentCaptor.forClass(Product.class);
 
     @Mock
     private ProductMapper productMapper;
@@ -42,18 +43,15 @@ class ProductServiceImplTest {
     public void shouldReturnInfoProductDtoWhenProductExists() {
         //Given
         UUID uuid = UUID.fromString("3ecb77f7-0114-47a7-ada7-3ec685d202a7");
-
         Product product = ProductTestData.builder()
                 .build()
                 .buildProduct();
-
         InfoProductDto infoProductDto = ProductTestData.builder()
                 .build()
                 .buildInfoProductDto();
 
         when(productRepository.findById(uuid))
                 .thenReturn(Optional.of(product));
-
         when(productMapper.toInfoProductDto(product))
                 .thenReturn(infoProductDto);
 
@@ -78,10 +76,8 @@ class ProductServiceImplTest {
 
         //Then
         assertEquals(String.format("Product with uuid: %s not found", uuid), exception.getMessage());
-
         verify(productRepository)
                 .findById(uuid);
-
         verifyNoInteractions(productMapper);
     }
 
@@ -91,17 +87,14 @@ class ProductServiceImplTest {
         Product product = ProductTestData.builder()
                 .build()
                 .buildProduct();
-
         InfoProductDto infoProductDto = ProductTestData.builder()
                 .build()
                 .buildInfoProductDto();
-
         List<Product> products = Collections.singletonList(product);
         List<InfoProductDto> expected = Collections.singletonList(infoProductDto);
 
         when(productRepository.findAll())
                 .thenReturn(products);
-
         when(productMapper.toInfoProductDto(product))
                 .thenReturn(infoProductDto);
 
@@ -110,10 +103,8 @@ class ProductServiceImplTest {
 
         //Then
         assertEquals(expected, result);
-
         verify(productRepository)
                 .findAll();
-
         verify(productMapper)
                 .toInfoProductDto(product);
     }
@@ -169,8 +160,6 @@ class ProductServiceImplTest {
     @Test
     public void shouldUpdateExistingProduct() {
         //Given
-        ArgumentCaptor<Product> productCaptor = ArgumentCaptor.forClass(Product.class);
-
         Product product = ProductTestData.builder()
                 .build()
                 .buildProduct();
@@ -207,16 +196,11 @@ class ProductServiceImplTest {
     public void shouldDeleteExistingProduct() {
         //Given
         UUID uuid = UUID.fromString("3ecb77f7-0114-47a7-ada7-3ec685d202a7");
-        Product product = ProductTestData.builder()
-                .build()
-                .buildProduct();
-        when(productRepository.findById(uuid)).thenReturn(Optional.of(product));
 
         //When
         productService.delete(uuid);
 
         //Then
-        verify(productRepository).findById(uuid);
         verify(productRepository).delete(uuid);
     }
 }

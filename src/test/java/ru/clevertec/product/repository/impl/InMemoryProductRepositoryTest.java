@@ -3,6 +3,7 @@ package ru.clevertec.product.repository.impl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.clevertec.product.entity.Product;
+import ru.clevertec.product.exception.ProductCanNotBeNull;
 import ru.clevertec.product.repository.ProductRepository;
 import ru.clevertec.product.utils.ProductTestData;
 
@@ -14,7 +15,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class InMemoryProductRepositoryTest {
 
@@ -28,17 +33,15 @@ class InMemoryProductRepositoryTest {
     @Test
     void shouldReturnProductWhenProductWithGivenIdExists() {
         // Given
-        Product expected = ProductTestData.builder()
-                .build()
-                .buildProduct();
+        Product expected = ProductTestData.builder().build().buildProduct();
         repository.save(expected);
 
         // When
         Optional<Product> foundProduct = repository.findById(expected.getUuid());
 
         // Then
-        assertTrue(foundProduct.isPresent(), "Product should be found");
-        assertEquals(expected, foundProduct.get(), "Found product should match the saved product");
+        assertAll("product test", () -> assertTrue(foundProduct.isPresent(), "Product should be found"), () -> assertEquals(expected, foundProduct.get(), "Found product should match the saved product"));
+
     }
 
     @Test
@@ -56,16 +59,13 @@ class InMemoryProductRepositoryTest {
     @Test
     void shouldSaveAndReturnProduct() {
         // Given
-        Product expected = ProductTestData.builder()
-                .withUuid(null)
-                .build()
-                .buildProduct();
+        Product expected = ProductTestData.builder().withUuid(null).build().buildProduct();
 
         // When
         Product savedProduct = repository.save(expected);
 
         // Then
-        assertThat(savedProduct)
+        assertThat(savedProduct).hasFieldOrPropertyWithValue(Product.Fields.uuid, expected.getUuid())
                 .hasFieldOrPropertyWithValue(Product.Fields.name, expected.getName())
                 .hasFieldOrPropertyWithValue(Product.Fields.description, expected.getDescription())
                 .hasFieldOrPropertyWithValue(Product.Fields.price, expected.getPrice())
@@ -75,16 +75,14 @@ class InMemoryProductRepositoryTest {
     @Test
     void shouldThrowExceptionWhenTryingToSaveNullProduct() {
         // Given & When & Then
-        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> repository.save(null));
+        ProductCanNotBeNull thrown = assertThrows(ProductCanNotBeNull.class, () -> repository.save(null));
         assertEquals("Product cannot be null", thrown.getMessage(), "Exception message should match");
     }
 
     @Test
     void shouldDeleteProductWhenProductWithGivenIdExists() {
         // Given
-        Product expected = ProductTestData.builder()
-                .build()
-                .buildProduct();
+        Product expected = ProductTestData.builder().build().buildProduct();
         repository.save(expected);
 
         // When
@@ -97,19 +95,11 @@ class InMemoryProductRepositoryTest {
     @Test
     void shouldReturnAllSavedProducts() {
         // Given
-        Product expected1 = ProductTestData.builder()
-                .withUuid(null)
-                .build()
-                .buildProduct();
+        Product expected1 = ProductTestData.builder().withUuid(null).build().buildProduct();
 
-        Product expected2 = ProductTestData.builder()
-                .withUuid(UUID.fromString("ebc3c5b1-aeaa-44f5-8d8a-bfcc53de36e6"))
-                .withName("ProductName1")
-                .withDescription("ProductDescription1")
-                .withPrice(BigDecimal.valueOf(120))
-                .withCreated(LocalDateTime.of(2023, 11, 13, 12, 34))
-                .build()
-                .buildProduct();
+        Product expected2 = ProductTestData.builder().withUuid(UUID.fromString("ebc3c5b1-aeaa-44f5-8d8a-bfcc53de36e6"))
+                .withName("ProductName1").withDescription("ProductDescription1").withPrice(BigDecimal.valueOf(120))
+                .withCreated(LocalDateTime.of(2023, 11, 13, 12, 34)).build().buildProduct();
 
         repository.save(expected1);
         repository.save(expected2);
@@ -118,8 +108,7 @@ class InMemoryProductRepositoryTest {
         List<Product> allProducts = repository.findAll();
 
         // Then
-        assertEquals(2, allProducts.size(), "All saved products should be returned");
-        assertTrue(allProducts.containsAll(Arrays.asList(expected1, expected2)), "All saved products should be in the returned list");
+        assertAll("product test", () -> assertEquals(2, allProducts.size(), "All saved products should be returned"), () -> assertTrue(allProducts.containsAll(Arrays.asList(expected1, expected2)), "All saved products should be in the returned list"));
     }
 
     @Test

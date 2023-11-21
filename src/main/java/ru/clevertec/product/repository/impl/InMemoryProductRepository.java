@@ -1,6 +1,7 @@
 package ru.clevertec.product.repository.impl;
 
 import ru.clevertec.product.entity.Product;
+import ru.clevertec.product.exception.ProductCanNotBeNull;
 import ru.clevertec.product.repository.ProductRepository;
 
 import java.util.ArrayList;
@@ -27,9 +28,15 @@ public class InMemoryProductRepository implements ProductRepository {
     @Override
     public Product save(Product product) {
         if (product == null) {
-            throw new IllegalArgumentException("Product cannot be null");
+            throw new ProductCanNotBeNull();
         }
-        products.put(product.getUuid(), product);
+
+        if (products.containsKey(product.getUuid())) {
+            products.put(product.getUuid(), product);
+        }
+        else {
+            products.put(product.getUuid(), product);
+        }
         return product;
     }
 

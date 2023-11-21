@@ -38,22 +38,19 @@ public class ProductServiceImpl implements ProductService {
     public UUID create(ProductDto productDto) {
         Product product = productMapper.toProduct(productDto);
         product.setCreated(LocalDateTime.now());
+        product.setUuid(UUID.randomUUID());
         return productRepository.save(product).getUuid();
     }
 
     @Override
     public void update(UUID uuid, ProductDto productDto) {
-        Product product = productRepository.findById(uuid)
-                .orElseThrow(() -> new ProductNotFoundException(uuid));
+        Product product = productRepository.findById(uuid).orElseThrow(() -> new ProductNotFoundException(uuid));
         productMapper.merge(product, productDto);
         productRepository.save(product);
     }
 
     @Override
     public void delete(UUID uuid) {
-        if (productRepository.findById(uuid).isEmpty()) {
-            throw new ProductNotFoundException(uuid);
-        }
         productRepository.delete(uuid);
     }
 }

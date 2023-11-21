@@ -10,8 +10,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Builder(setterPrefix = "with")
 @Data
+@Builder(setterPrefix = "with")
 public class ProductTestData {
 
     @Builder.Default
@@ -36,7 +36,7 @@ public class ProductTestData {
     public ProductDto buildProductDto() {
         return new ProductDto(name, description, price);
     }
-  
+
     public InfoProductDto buildInfoProductDto() {
         return new InfoProductDto(uuid, name, description, price);
     }
